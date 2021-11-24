@@ -17,7 +17,8 @@ class Menucontroller extends Controller
      */
     public function index()
     {
-        return view('management.menu');
+        $menus = Menu::all();
+        return view('management.menu')->with('menus', $menus);
     }
 
     /**
@@ -42,10 +43,12 @@ class Menucontroller extends Controller
         $request->validate([
             'name' => 'required|unique:menus|max:255',
             'price' => 'required|numeric',
-            'category_id' => 'numeric'
+            'category_id' => 'required|numeric'
         ]);
-
+        //if a user does not uploade an image, use noimge.png for the menu
         $imageName = "noimage.png";
+
+        //if a user upload image
         if($request->image){
             $request->validate([
                 'image' => 'nullable|file|image|mimes:jpeg,png,jpg|max:5000'
@@ -53,14 +56,15 @@ class Menucontroller extends Controller
             $imageName = date('mdYHis').uniqid().'.'.$request->image->extension();
             $request->image->move(public_path('menu_images'), $imageName);
         }
+        //save information to Menus table
         $menu = new Menu();
         $menu->name = $request->name;
         $menu->price = $request->price;
-        $menu->image = $request->image;
+        $menu->image = $imageName;
         $menu->description = $request->description;
         $menu->category_id = $request->category_id;
         $menu->save();
-        $request->session()->flash('status', $request->name. ' is saves successfully.');
+        $request->session()->flash('status', $request->name. ' was saved successfully');
         return redirect('/management/menu');
     }
 
@@ -83,7 +87,9 @@ class Menucontroller extends Controller
      */
     public function edit($id)
     {
-        //
+        $menu = Menu::find($id);
+        $categories = Category::all();
+        return view('management.editMenu')->with('menu', $menu)->with('categories', $categories);
     }
 
     /**
@@ -95,7 +101,34 @@ class Menucontroller extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'required|max:255',
+            'price' => 'required|numeric',
+            'category_id' => 'required|numeric'
+        ]);
+        $menu = Menu::find($id);
+        $imageName = "noimage.png";
+
+        //if a user upload image
+        if($request->image){
+            $request->validate([
+                'image' => 'nullable|file|image|mimes:jpeg,png,jpg|max:5000'
+            ]);
+            $imageName = date('mdYHis').uniqid().'.'.$request->image->extension();
+            $request->image->move(public_path('menu_images'), $imageName);
+        }
+        else{
+            $imageName = $menu->image;
+        }
+
+        $menu->name = $request->name;
+        $menu->price = $request->price;
+        $menu->image = $imageName;
+        $menu->description = $request->description;
+        $menu->category_id = $request->category_id;
+        $menu->save();
+        $request->session()->flash('status', $request->name. ' was updated successfully.');
+        return redirect('/management/menu');
     }
 
     /**
@@ -106,6 +139,12 @@ class Menucontroller extends Controller
      */
     public function destroy($id)
     {
-        //
+        $menu = Menu::find($id);
+        if($menu->image != "noimage.png"){
+            unlink(public_path('menu_images').'/'.$menu->image);
+        }
+        $menuName = $menu->name;
+        $menu->delete();
+        Session()->flash('status', $menuName. ' was deleted successfully.');
     }
 }

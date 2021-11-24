@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Category;
+use App\Table;
 
-class CategoryController extends Controller
+class TableController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +15,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::paginate(5);
-        return view('management.category')->with('categories',$categories);
+        $tables = Table::all();
+        return view('management.table')->with('tables', $tables);
     }
 
     /**
@@ -26,7 +26,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('management.createCategory');
+        return view('management.createTable');
     }
 
     /**
@@ -37,14 +37,12 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|unique:categories|max:255'
-        ]);
-        $category = new Category;
-        $category->name = $request->name;
-        $category->save();
-        $request->session()->flash('status', $request->name. ' was saved successfully.');
-        return(redirect('/management/category'));
+        $request->validate(['name' => 'required|unique:tables|max:255']);
+        $table = new Table();
+        $table->name = $request->name;
+        $table->save();
+        $request->session()->flash('status','Table '. $request->name. ' was created successfully');
+        return redirect('management/table');
     }
 
     /**
@@ -66,8 +64,8 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        $category = Category::find($id);
-        return view('management.editCategory')->with('category',$category);
+        $table = Table::find($id);
+        return view('management.editTable')->with('table', $table);
     }
 
     /**
@@ -79,14 +77,12 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|unique:categories|max:255'
-        ]);
-        $category = Category::find($id);
-        $category->name = $request->name;
-        $category->save();
-        $request->session()->flash('status', $request->name. ' was updated successfully.');
-        return(redirect('/management/category'));
+        $request->validate(['name' => 'required|unique:tables|max:255']);
+        $table = Table::find($id);
+        $table->name = $request->name;
+        $table->save();
+        $request->session()->flash('status','Table '. $request->name. ' was updated successfully');
+        return redirect('management/table');
     }
 
     /**
@@ -97,8 +93,8 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        Category::destroy($id);
-        Session()->flash('status','The category was deleted successfully.');
-        return redirect('/management/category');
+        Table::destroy($id);
+        Session()->flash('status','The table was deleted successfully.');
+        return redirect('/management/table');
     }
 }

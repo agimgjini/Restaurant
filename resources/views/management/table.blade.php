@@ -5,8 +5,8 @@
         <div class="row justify-content-center">
             @include('management.inc.sidebar')
             <div class="col-md-8">
-                <i class="fas fa-align-justify"></i> Create a Category
-                <a href="/management/category/create" class="btn btn-success btn-sm float-right"><i class="fas fa-plus"></i>Create Category</a>
+                <i class="fas fa-align-chair"></i> Create a Table
+                <a href="/management/table/create" class="btn btn-success btn-sm float-right"><i class="fas fa-plus"></i>Create Table</a>
                 <hr>
                 @if (Session()->has('status'))
                     <div class="alert alert-success">
@@ -19,29 +19,29 @@
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
-                            <th scope="col">Category</th>
+                            <th scope="col">Table</th>
+                            <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($categories as $category)
+                        @foreach ($tables as $table)
                             <tr>
-                                <th scope="row">{{$category->id}}</th>
-                                <th>{{$category->name}}</th>
+                                <td>{{$table->id}}</td>
+                                <td>{{$table->name}}</td>
+                                <td>{{$table->status}}</td>
                                 <td>
-                                    <a href="/management/category/{{$category->id}}/edit" class="btn btn-warning">Edit</a>
-                                </td>
+                                    <a href="/management/table/{{$table->id}}/edit" class="btn btn-warning">Edit</a></td>
                                 <td>
-                                    <form action="/management/category/{{$category->id}}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger" onclick="return confirm('Are you sure?')">DELETE</button>
+                                    <form action="/management/table/{{$table->id}}" method="post">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-danger" onclick="return confirm('Are you sure?')">DELETE</button>
                                     </form>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
-                {{$categories->links()}}
             </div>
         </div>
     </div>
